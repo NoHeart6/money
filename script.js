@@ -261,24 +261,26 @@ async function showAppDetails(appId) {
             </div>
         `,
         showCancelButton: true,
-        confirmButtonText: '<i class="fas fa-download"></i> Download Sekarang',
+        confirmButtonText: adClickCount === 0 ? 
+            '<i class="fas fa-lock"></i> Klik Iklan Dulu' : 
+            '<i class="fas fa-download"></i> Download Sekarang',
         cancelButtonText: 'Batal',
-        confirmButtonColor: '#01875f',
+        confirmButtonColor: adClickCount === 0 ? '#6c757d' : '#01875f',
         cancelButtonColor: '#6c757d',
         width: '42em',
         customClass: {
             container: 'app-details-modal',
-            confirmButton: 'download-button',
+            confirmButton: adClickCount === 0 ? 'locked-button' : 'download-button',
             cancelButton: 'cancel-button'
         }
     });
 
     if (result.isConfirmed) {
-        if (adClickCount < 2) {
+        if (adClickCount === 0) {
             await Swal.fire({
                 icon: 'warning',
                 title: 'Klik Iklan Dulu!',
-                text: 'Klik salah satu iklan untuk melanjutkan download (${2 - adClickCount} klik lagi)',
+                text: 'Klik salah satu iklan untuk membuka tombol download',
                 confirmButtonColor: '#01875f'
             });
             showAppDetails(appId);
@@ -293,10 +295,17 @@ function handleAdClick() {
     adClickCount++;
     if (adClickCount === 1) {
         Swal.fire({
-            icon: 'info',
-            title: 'Klik 1 iklan lagi!',
-            text: 'Klik satu iklan lagi untuk bisa download',
+            icon: 'success',
+            title: 'Berhasil!',
+            text: 'Tombol download telah terbuka',
             confirmButtonColor: '#01875f'
+        }).then(() => {
+            // Refresh dialog detail aplikasi untuk memperbarui tombol
+            const currentAppId = document.querySelector('.app-details img').alt;
+            const app = [...apps, ...games].find(a => a.name === currentAppId);
+            if (app) {
+                showAppDetails(app.id);
+            }
         });
     }
 }
