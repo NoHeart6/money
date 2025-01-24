@@ -183,9 +183,6 @@ async function showAppDetails(appId) {
     const app = [...apps, ...games].find(a => a.id === parseInt(appId));
     if (!app) return;
 
-    // Reset hitungan klik iklan untuk setiap aplikasi baru
-    adClickCount = 0;
-
     const result = await Swal.fire({
         title: '',
         html: `
@@ -207,7 +204,7 @@ async function showAppDetails(appId) {
                 </div>
 
                 <!-- Native Banner Ad -->
-                <div class="ad-container" style="margin: 15px 0; cursor: pointer;" onclick="handleAdClick()">
+                <div class="ad-container" style="margin: 15px 0;">
                     <div id="container-6c0c51198f88ed66cea2025869a59e21"></div>
                 </div>
 
@@ -246,7 +243,7 @@ async function showAppDetails(appId) {
                 </div>
 
                 <!-- Banner Ad 728x90 -->
-                <div class="ad-container" style="margin: 15px 0; cursor: pointer;" onclick="handleAdClick()">
+                <div class="ad-container" style="margin: 15px 0;">
                     <script type="text/javascript">
                         atOptions = {
                             'key' : 'd9d9260bb94dad53b406afa63c5e14d6',
@@ -261,52 +258,20 @@ async function showAppDetails(appId) {
             </div>
         `,
         showCancelButton: true,
-        confirmButtonText: adClickCount === 0 ? 
-            '<i class="fas fa-lock"></i> Klik Iklan Dulu' : 
-            '<i class="fas fa-download"></i> Download Sekarang',
+        confirmButtonText: '<i class="fas fa-download"></i> Download Sekarang',
         cancelButtonText: 'Batal',
-        confirmButtonColor: adClickCount === 0 ? '#6c757d' : '#01875f',
+        confirmButtonColor: '#01875f',
         cancelButtonColor: '#6c757d',
         width: '42em',
         customClass: {
             container: 'app-details-modal',
-            confirmButton: adClickCount === 0 ? 'locked-button' : 'download-button',
+            confirmButton: 'download-button',
             cancelButton: 'cancel-button'
         }
     });
 
     if (result.isConfirmed) {
-        if (adClickCount === 0) {
-            await Swal.fire({
-                icon: 'warning',
-                title: 'Klik Iklan Dulu!',
-                text: 'Klik salah satu iklan untuk membuka tombol download',
-                confirmButtonColor: '#01875f'
-            });
-            showAppDetails(appId);
-        } else {
-            startDownload(app);
-        }
-    }
-}
-
-// Fungsi untuk menangani klik iklan
-function handleAdClick() {
-    adClickCount++;
-    if (adClickCount === 1) {
-        Swal.fire({
-            icon: 'success',
-            title: 'Berhasil!',
-            text: 'Tombol download telah terbuka',
-            confirmButtonColor: '#01875f'
-        }).then(() => {
-            // Refresh dialog detail aplikasi untuk memperbarui tombol
-            const currentAppId = document.querySelector('.app-details img').alt;
-            const app = [...apps, ...games].find(a => a.name === currentAppId);
-            if (app) {
-                showAppDetails(app.id);
-            }
-        });
+        startDownload(app);
     }
 }
 
